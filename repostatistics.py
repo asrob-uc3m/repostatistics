@@ -21,8 +21,10 @@ def main():
             total_contribs += int(contributor['contributions'])
             contributors[contributor['login']] = total_contribs
 
+    print("<html><body>")
     for i, contributor in enumerate(reversed(sorted(contributors.items(), key=operator.itemgetter(1)))):
-        print("{:2.0f}. {} -> {}".format(i, contributor[0], contributor[1]))
+        print("{:2.0f}. {} -> {}<br>".format(i+1, contributor[0], contributor[1]))
+    print("</body></html>")
 
 if __name__ == '__main__':
     main()
