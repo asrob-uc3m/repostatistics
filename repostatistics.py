@@ -6,14 +6,15 @@ def main():
     org = 'asrob-uc3m'
     url_repos = 'https://api.github.com/orgs/{}/repos'
     url_repo_contributors = 'https://api.github.com/repos/{}/{}/contributors'
+    params = {'access_token':'put your token here'}
     contributors = {}
 
-    resp = requests.get(url=url_repos.format(org))
+    resp = requests.get(url=url_repos.format(org), params=params)
     data = json.loads(resp.text)
 
     for repo in tqdm(data):
         #print(repo)
-        resp = requests.get(url_repo_contributors.format(org, repo['name']))
+        resp = requests.get(url_repo_contributors.format(org, repo['name']), params=params)
         contrib_data = json.loads(resp.text)
 
         for contributor in contrib_data:
