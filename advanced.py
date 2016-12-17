@@ -40,9 +40,26 @@ def do_stuff(*args, **kwargs):
             work_group['repos'].append(repo['name'])
         asrob['teams'][team['name']] = work_group
 
-    asrob['repos'] = dict()
+    # Repos
+    url_repos = url_org.format(kwargs['org'])+'/repos'
+    repos_data = dr.retrieve(url_repos)
 
-    
+    asrob['repos'] = dict()
+    for repo_data in repos_data:
+        repo = dict()
+        repo['open_issues'] = repo_data['open_issues']
+        repo['issues'] = {}
+        for issue_data in tqdm(dr.retrieve(repo_data['issues_url'].replace('{/number}', ''))):
+            issue = {}
+            print(issue_data)
+            issue['title'] = issue_data['title']
+            issue['assignees'] = list(issue_data['assignees'])
+            issue['labels'] = [label['name'] for label in issue_data['labels']]
+            repo['issues'][issue_data['number']] = issue
+
+        asrob['repos'][repo_data['name']] = repo
+
+
     print(asrob)
 
 
