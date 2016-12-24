@@ -5,6 +5,9 @@ import begin
 
 
 class DataRetriever(object):
+    """
+    Retrieves data from github, catching the already visited urls to avoid unnecessary requests
+    """
     def __init__(self, token=None):
         self.cache = {}
         if token:
@@ -20,16 +23,36 @@ class DataRetriever(object):
 
         return self.cache[url]
 
-def extract_all_data(*args, **kwargs):
+def extract_all_data(org_name = '', access_token = ''):
+    """
+    Extracts data from the requested github organization. The returned dict has the
+    following format:
+
+    organization
+     |- teams
+     |    |- members
+     |    |- repos
+     |- repos
+     |    |- open_issues
+     |    |- issues
+     |    |- contributors
+     |- members
+     |    |- name
+     |    |- avatar_url
+
+    :param org_name: Name of the github organization to retrieve the data from
+    :param access_token: Access token that grant access to the organization private data
+    :return: a organization dict with the format described in this docstring
+    """
     url_org = 'https://api.github.com/orgs/{}'
-    dr = DataRetriever(kwargs['access_token'])
-    asrob = {}
+    dr = DataRetriever(access_token)
+    organization = {}
 
     # Teams
-    url_teams = url_org.format(kwargs['org'])+'/teams'
+    url_teams = url_org.format(org_name)+'/teams'
     teams_data = dr.retrieve(url_teams)
 
-    asrob['teams'] = dict()
+    organization['teams'] = dict()
     for team in teams_data:
         work_group = dict()
         work_group['members'] = list()
@@ -38,13 +61,13 @@ def extract_all_data(*args, **kwargs):
         work_group['repos'] = list()
         for repo in tqdm(dr.retrieve(team['repositories_url'])):
             work_group['repos'].append(repo['name'])
-        asrob['teams'][team['name']] = work_group
+        organization['teams'][team['name']] = work_group
 
     # Repos
-    url_repos = url_org.format(kwargs['org'])+'/repos'
+    url_repos = url_org.format(org_name)+'/repos'
     repos_data = dr.retrieve(url_repos)
 
-    asrob['repos'] = dict()
+    organization['repos'] = dict()
     for repo_data in repos_data:
         repo = dict()
         # Retrieve issues
@@ -61,26 +84,35 @@ def extract_all_data(*args, **kwargs):
         repo['contributors'] = dict()
         for contrib_data in tqdm(dr.retrieve(repo_data['contributors_url'])):
             repo['contributors'][contrib_data['login']] = contrib_data['contributions']
-        asrob['repos'][repo_data['name']] = repo
+        organization['repos'][repo_data['name']] = repo
 
     # Members
-    asrob['members'] = dict()
-    url_members = url_org.format(kwargs['org'])+'/members'
+    organization['members'] = dict()
+    url_members = url_org.format(org_name)+'/members'
     members_data = dr.retrieve(url_members)
 
     for user in members_data:
         member = dict()
         member['avatar_url'] = user['avatar_url']
         # The rest of the info about members can be computed from previous data (repos)
-        asrob['members'][user['login']] = member
+        # Not sure if I should pre-compute all this info or compute it just when requested
+        contribs = 0
+        for repo in organization['repos'].values():
+            try:
+                contribs += repo['contributors'][user['login']]
+            except KeyError:
+                pass
+        member['total_contributions'] = contribs
+        organization['members'][user['login']] = member
 
-
-    print(asrob['teams'])
-    for name, repo in asrob['repos'].items():
-        print(name, repo['open_issues'], len(repo['issues']), len(repo['contributors']))
-    print(asrob['members'])
+    return organization
 
 
 @begin.start(auto_convert=True)
 def main(org, access_token = None):
-    return extract_all_data(org=org, access_token=access_token)
+    organization = extract_all_data(org_name=org, access_token=access_token)
+
+    print(organization['teams'])
+    for name, repo in organization['repos'].items():
+        print(name, repo['open_issues'], len(repo['issues']), len(repo['contributors']))
+    print(organization['members'])

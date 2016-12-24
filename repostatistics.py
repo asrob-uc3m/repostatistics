@@ -1,37 +1,36 @@
-import requests, json
-import operator
-from tqdm import tqdm
 import begin
+import operator
+
+
+from advanced import extract_all_data
+
+def generate_webpage(organization):
+    webpage = ('<html>\n'
+         '    <body>\n'
+         '    <h1>Top Contributors</h1>\n'
+         '    <table style="width:100%">\n'
+         '        <tr>\n'
+         '            <th>Pos</th>\n'
+         '            <th>Username</th>\n'
+         '            <th>Contribs</th>\n'
+         '        </tr>\n'
+         '        {top_contributors_rows}\n'
+         '    </table>\n'
+         '    </body>\n'
+         '</html>')
+
+    top_contributors_rows = ''
+    sorted_contribs = sorted(organization['members'].items(), key=lambda x: x[1]['total_contributions'], reverse=True)
+    for i, (name, data) in enumerate(sorted_contribs):
+        top_contributors_rows += '<tr>\n<th>{}</th>\n<th>{}</th>\n<th>{}</th>\n</tr>\n'.format(i+1, name, data['total_contributions'])
+
+    return webpage.format(top_contributors_rows=top_contributors_rows)
+
 
 @begin.start(auto_convert=True)
-def main(org: 'Github organization name' = 'asrob-uc3m', access_token: 'Access token' = '',
-         generate_html: 'Generate html page with ranking' = False):
-    """
-    This is the program description
-    """
-    url_repos = 'https://api.github.com/orgs/{}/repos'
-    url_repo_contributors = 'https://api.github.com/repos/{}/{}/contributors'
-    contributors = {}
+def main(org, access_token = None, output_file = 'index.html'):
+    organization = extract_all_data(org_name=org, access_token=access_token)
 
-    if access_token:
-        params = {'access_token':access_token}
-    else:
-        params = None
+    with open(output_file, 'w') as f:
+        f.write(generate_webpage(organization))
 
-    resp = requests.get(url=url_repos.format(org), params=params)
-    data = json.loads(resp.text)
-
-    for repo in tqdm(data):
-        #print(repo)
-        resp = requests.get(url_repo_contributors.format(org, repo['name']), params=params)
-        contrib_data = json.loads(resp.text)
-
-        for contributor in contrib_data:
-            total_contribs = contributors.get(contributor['login'], 0)
-            total_contribs += int(contributor['contributions'])
-            contributors[contributor['login']] = total_contribs
-
-    print("<html><body>")
-    for i, contributor in enumerate(reversed(sorted(contributors.items(), key=operator.itemgetter(1)))):
-        print("{:2.0f}. {} -> {}<br>".format(i+1, contributor[0], contributor[1]))
-    print("</body></html>")
