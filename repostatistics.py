@@ -11,6 +11,7 @@ def generate_webpage(organization):
          '    <table style="width:100%">\n'
          '        <tr>\n'
          '            <th>Pos</th>\n'
+         '            <th></th>\n'
          '            <th>Username</th>\n'
          '            <th>Contribs</th>\n'
          '        </tr>\n'
@@ -19,10 +20,12 @@ def generate_webpage(organization):
          '    </body>\n'
          '</html>')
 
+    # Compute Top Contributors
     top_contributors_rows = ''
     sorted_contribs = sorted(organization['members'].items(), key=lambda x: x[1]['total_contributions'], reverse=True)
     for i, (name, data) in enumerate(sorted_contribs):
-        top_contributors_rows += '<tr>\n<th>{}</th>\n<th>{}</th>\n<th>{}</th>\n</tr>\n'.format(i+1, name, data['total_contributions'])
+        top_contributors_rows += '<tr>\n<th>{}</th>\n<th><img src="{}" width="50px"></th>\n<th>{}</th>\n<th>{}</th>\n</tr>\n'.format(i+1,
+                                    data['avatar_url'], name, data['total_contributions'])
 
     return webpage.format(top_contributors_rows=top_contributors_rows)
 
