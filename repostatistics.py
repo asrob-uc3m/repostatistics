@@ -64,10 +64,11 @@ def generate_webpage(organization):
 
     # Compute Top Issues
     top_issues_rows = ''
-    for i, (member, member_data) in enumerate(organization['members'].items()):
+    sorted_issues = sorted(organization['members'].items(), key=lambda x: len(x[1]['opened_issues']), reverse=True)
+    for i, (member, member_data) in enumerate(sorted_issues):
         top_issues_rows += '<tr>\n<th>{}</th>\n<th><img src="{}" width="50px"></th>\n<th>{}</th>\n<th>{}</th>\n<th>{}</th>\n<th>{}</th>\n</tr>\n'.format(
-                                i+1, member_data['avatar_url'], member, member_data['opened_issues'],
-                                member_data['closed_issues'], member_data['assigned_issues'])
+                                i+1, member_data['avatar_url'], member, len(member_data['opened_issues']),
+                                len(member_data['closed_issues']), len(member_data['assigned_issues']))
 
     return webpage.format(top_contributors_rows=top_contributors_rows, top_teams_rows=top_teams_rows,
                           top_issues_rows=top_issues_rows)

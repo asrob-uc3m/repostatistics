@@ -62,7 +62,7 @@ def extract_all_data(org_name = '', access_token = ''):
     teams_data = dr.retrieve(url_teams)
 
     organization['teams'] = dict()
-    for team in tqdm(teams_data):
+    for team in tqdm(teams_data, desc="Retrieving teams"):
         work_group = dict()
         work_group['members'] = list()
         for member in dr.retrieve(team['members_url'].replace('{/member}', '')):
@@ -77,7 +77,7 @@ def extract_all_data(org_name = '', access_token = ''):
     repos_data = dr.retrieve(url_repos)
 
     organization['repos'] = dict()
-    for repo_data in tqdm(repos_data):
+    for repo_data in tqdm(repos_data, desc="Retrieving repos"):
         repo = dict()
         # Retrieve issues
         repo['open_issues'] = repo_data['open_issues'] # Change to list to track open/close status
@@ -107,9 +107,9 @@ def extract_all_data(org_name = '', access_token = ''):
         # The rest of the info about members will be computed from previous data (repos)
         # Not sure if I should pre-compute all this info or compute it just when requested
         member['total_contributions'] = 0
-        member['opened_issues'] = 0
-        member['closed_issues'] = 0
-        member['assigned_issues'] = 0
+        member['opened_issues'] = []
+        member['closed_issues'] = []
+        member['assigned_issues'] = []
         organization['members'][user['login']] = member
 
     # Compute the rest of the info about members from previous data (repos)
@@ -124,15 +124,15 @@ def extract_all_data(org_name = '', access_token = ''):
         # Compute issues per member and classify in open/closed
         for issue, issue_data in repo_data['issues'].items():
             try:
-                organization['members'][issue_data['opened_by']]['opened_issues'] += 1
+                organization['members'][issue_data['opened_by']]['opened_issues'].append((repo_name, issue))
                 if issue_data['closed_by']:
-                    organization['members'][issue_data['closed_by']]['closed_issues'] += 1
+                    organization['members'][issue_data['closed_by']]['closed_issues'].append((repo_name, issue))
             except KeyError:
                 pass
 
             for assignee in issue_data['assignees']:
                 try:
-                    organization['members'][assignee]['assigned_issues'] += 1
+                    organization['members'][assignee]['assigned_issues'].append((repo_name, issue))
                 except KeyError:
                     pass
 
