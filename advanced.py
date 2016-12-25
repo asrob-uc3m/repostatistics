@@ -35,10 +35,19 @@ def extract_all_data(org_name = '', access_token = ''):
      |- repos
      |    |- open_issues
      |    |- issues
+     |    |    |- title
+     |    |    |- assignees []
+     |    |    |- labels []
+     |    |    |- opened_by
+     |    |    |- closed_by (needs to request for events)
      |    |- contributors
      |- members
      |    |- name
      |    |- avatar_url
+     |    |- total_contributions
+     |    |- opened_issues
+     |    |- closed_issues
+     |    |- assigned_issues
 
     :param org_name: Name of the github organization to retrieve the data from
     :param access_token: Access token that grant access to the organization private data
@@ -53,13 +62,13 @@ def extract_all_data(org_name = '', access_token = ''):
     teams_data = dr.retrieve(url_teams)
 
     organization['teams'] = dict()
-    for team in teams_data:
+    for team in tqdm(teams_data):
         work_group = dict()
         work_group['members'] = list()
-        for member in tqdm(dr.retrieve(team['members_url'].replace('{/member}', ''))):
+        for member in dr.retrieve(team['members_url'].replace('{/member}', '')):
             work_group['members'].append(member['login'])
         work_group['repos'] = list()
-        for repo in tqdm(dr.retrieve(team['repositories_url'])):
+        for repo in dr.retrieve(team['repositories_url']):
             work_group['repos'].append(repo['name'])
         organization['teams'][team['name']] = work_group
 
@@ -68,21 +77,22 @@ def extract_all_data(org_name = '', access_token = ''):
     repos_data = dr.retrieve(url_repos)
 
     organization['repos'] = dict()
-    for repo_data in repos_data:
+    for repo_data in tqdm(repos_data):
         repo = dict()
         # Retrieve issues
-        repo['open_issues'] = repo_data['open_issues']
+        repo['open_issues'] = repo_data['open_issues'] # Change to list to track open/close status
         repo['issues'] = dict()
-        for issue_data in tqdm(dr.retrieve(repo_data['issues_url'].replace('{/number}', '')+'?state=all')):
+        for issue_data in dr.retrieve(repo_data['issues_url'].replace('{/number}', '')+'?state=all'):
             issue = dict()
             issue['title'] = issue_data['title']
-            issue['assignees'] = list(issue_data['assignees'])
+            issue['assignees'] = [asignee['login'] for asignee in issue_data['assignees']]
             issue['labels'] = [label['name'] for label in issue_data['labels']]
+            issue['opened_by'] = issue_data['user']['login']
             repo['issues'][issue_data['number']] = issue
 
         # Retrieve contributors
         repo['contributors'] = dict()
-        for contrib_data in tqdm(dr.retrieve(repo_data['contributors_url'])):
+        for contrib_data in dr.retrieve(repo_data['contributors_url']):
             repo['contributors'][contrib_data['login']] = contrib_data['contributions']
         organization['repos'][repo_data['name']] = repo
 
@@ -94,19 +104,37 @@ def extract_all_data(org_name = '', access_token = ''):
     for user in members_data:
         member = dict()
         member['avatar_url'] = user['avatar_url']
-        # The rest of the info about members can be computed from previous data (repos)
+        # The rest of the info about members will be computed from previous data (repos)
         # Not sure if I should pre-compute all this info or compute it just when requested
-        contribs = 0
-        for repo in organization['repos'].values():
-            try:
-                contribs += repo['contributors'][user['login']]
-            except KeyError:
-                pass
-        member['total_contributions'] = contribs
+        member['total_contributions'] = 0
+        member['opened_issues'] = 0
+        member['closed_issues'] = 0
+        member['assigned_issues'] = 0
         organization['members'][user['login']] = member
 
-    # Compute issues per member and classify in open/closed
+    # Compute the rest of the info about members from previous data (repos)
+    for repo_name, repo_data in organization['repos'].items():
+        # Add contributions per repo to each member
+        for contributor, contribs in repo_data['contributors'].items():
+            try:
+                organization['members'][contributor]['total_contributions'] += contribs
+            except KeyError:
+                pass
 
+        # Compute issues per member and classify in open/closed
+        for issue, issue_data in repo_data['issues'].items():
+            try:
+                organization['members'][issue_data['opened_by']]['opened_issues'] += 1
+                if issue_data['closed_by']:
+                    organization['members'][issue_data['closed_by']]['closed_issues'] += 1
+            except KeyError:
+                pass
+
+            for assignee in issue_data['assignees']:
+                try:
+                    organization['members'][assignee]['assigned_issues'] += 1
+                except KeyError:
+                    pass
 
     return organization
 

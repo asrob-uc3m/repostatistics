@@ -26,6 +26,18 @@ def generate_webpage(organization):
          '        </tr>\n'
          '        {top_teams_rows}\n'
          '    </table>\n'
+         '    <h1>Top Issues</h1>\n'
+         '    <table style="width:100%">\n'
+         '        <tr>\n'
+         '            <th>Pos</th>\n'
+         '            <th></th>\n'
+         '            <th>Username</th>\n'
+         '            <th>Opened Issues</th>\n'
+         '            <th>Closed Issues</th>\n'
+         '            <th>Assigned Issues</th>\n'
+         '        </tr>\n'
+         '        {top_issues_rows}\n'
+         '    </table>\n'
          '    </body>\n'
          '</html>')
 
@@ -50,7 +62,15 @@ def generate_webpage(organization):
     for i, (team, contribs) in enumerate(sorted_team_contribs):
         top_teams_rows += '<tr>\n<th>{}</th>\n<th>{}</th>\n<th>{}</th>\n</tr>\n'.format(i+1, team, contribs)
 
-    return webpage.format(top_contributors_rows=top_contributors_rows, top_teams_rows=top_teams_rows)
+    # Compute Top Issues
+    top_issues_rows = ''
+    for i, (member, member_data) in enumerate(organization['members'].items()):
+        top_issues_rows += '<tr>\n<th>{}</th>\n<th><img src="{}" width="50px"></th>\n<th>{}</th>\n<th>{}</th>\n<th>{}</th>\n<th>{}</th>\n</tr>\n'.format(
+                                i+1, member_data['avatar_url'], member, member_data['opened_issues'],
+                                member_data['closed_issues'], member_data['assigned_issues'])
+
+    return webpage.format(top_contributors_rows=top_contributors_rows, top_teams_rows=top_teams_rows,
+                          top_issues_rows=top_issues_rows)
 
 
 @begin.start(auto_convert=True)
