@@ -1,5 +1,4 @@
 import begin
-import operator
 
 
 from advanced import extract_all_data
@@ -33,8 +32,10 @@ def generate_webpage(organization):
          '            <th></th>\n'
          '            <th>Username</th>\n'
          '            <th>Opened Issues</th>\n'
+         '            <th>Currently Open</th>\n'
          '            <th>Closed Issues</th>\n'
-         '            <th>Assigned Issues</th>\n'
+         '            <th>Assigned and open</th>\n'
+         '            <th>Assigned and closed</th>\n'
          '        </tr>\n'
          '        {top_issues_rows}\n'
          '    </table>\n'
@@ -66,9 +67,32 @@ def generate_webpage(organization):
     top_issues_rows = ''
     sorted_issues = sorted(organization['members'].items(), key=lambda x: len(x[1]['closed_issues']), reverse=True)
     for i, (member, member_data) in enumerate(sorted_issues):
-        top_issues_rows += '<tr>\n<th>{}</th>\n<th><img src="{}" width="50px"></th>\n<th>{}</th>\n<th>{}</th>\n<th>{}</th>\n<th>{}</th>\n</tr>\n'.format(
-                                i+1, member_data['avatar_url'], member, len(member_data['opened_issues']),
-                                len(member_data['closed_issues']), len(member_data['assigned_issues']))
+        currently_open = 0
+        for repo, issue in member_data['opened_issues']:
+            if issue in organization['repos'][repo]['open_issues']:
+                currently_open += 1
+
+        assigned_and_open = 0
+        assigned_and_closed = 0
+        for repo, issue in member_data['assigned_issues']:
+            if issue in organization['repos'][repo]['open_issues']:
+                assigned_and_open += 1
+            else:
+                assigned_and_closed += 1
+
+        top_issues_rows += \
+        """<tr>
+           <th>{}</th>
+           <th><img src="{}" width="50px"></th>
+           <th>{}</th>
+           <th>{}</th>
+           <th>{}</th>
+           <th>{}</th>
+           <th>{}</th>
+           <th>{}</th>
+        </tr>
+        """.format(i+1, member_data['avatar_url'], member, len(member_data['opened_issues']), currently_open,
+                                len(member_data['closed_issues']), assigned_and_open, assigned_and_closed)
 
     return webpage.format(top_contributors_rows=top_contributors_rows, top_teams_rows=top_teams_rows,
                           top_issues_rows=top_issues_rows)
