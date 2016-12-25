@@ -33,7 +33,7 @@ def extract_all_data(org_name = '', access_token = ''):
      |    |- members
      |    |- repos []
      |- repos
-     |    |- open_issues
+     |    |- open_issues []
      |    |- issues
      |    |    |- title
      |    |    |- assignees []
@@ -80,7 +80,7 @@ def extract_all_data(org_name = '', access_token = ''):
     for repo_data in tqdm(repos_data, desc="Retrieving repos"):
         repo = dict()
         # Retrieve issues
-        repo['open_issues'] = repo_data['open_issues'] # Change to list to track open/close status
+        repo['open_issues'] = []
         repo['issues'] = dict()
         for issue_data in dr.retrieve(repo_data['issues_url'].replace('{/number}', '')+'?state=all'):
             issue = dict()
@@ -88,6 +88,15 @@ def extract_all_data(org_name = '', access_token = ''):
             issue['assignees'] = [asignee['login'] for asignee in issue_data['assignees']]
             issue['labels'] = [label['name'] for label in issue_data['labels']]
             issue['opened_by'] = issue_data['user']['login']
+            issue['closed'] = issue_data['state'] == 'closed'
+            issue['closed_by'] = None
+            if not issue['closed']:
+                repo['open_issues'].append(issue_data['number'])
+            else:
+                for event in reversed(dr.retrieve(issue_data['events_url'].replace('{/privacy}', ''))):
+                    if event['event'] == 'closed':
+                        issue['closed_by'] = event['actor']['login']
+                        break
             repo['issues'][issue_data['number']] = issue
 
         # Retrieve contributors
