@@ -31,7 +31,7 @@ def extract_all_data(org_name = '', access_token = ''):
     organization
      |- teams
      |    |- members
-     |    |- repos
+     |    |- repos []
      |- repos
      |    |- open_issues
      |    |- issues
@@ -73,7 +73,7 @@ def extract_all_data(org_name = '', access_token = ''):
         # Retrieve issues
         repo['open_issues'] = repo_data['open_issues']
         repo['issues'] = dict()
-        for issue_data in tqdm(dr.retrieve(repo_data['issues_url'].replace('{/number}', ''))):
+        for issue_data in tqdm(dr.retrieve(repo_data['issues_url'].replace('{/number}', '')+'?state=all')):
             issue = dict()
             issue['title'] = issue_data['title']
             issue['assignees'] = list(issue_data['assignees'])
@@ -104,6 +104,9 @@ def extract_all_data(org_name = '', access_token = ''):
                 pass
         member['total_contributions'] = contribs
         organization['members'][user['login']] = member
+
+    # Compute issues per member and classify in open/closed
+
 
     return organization
 
