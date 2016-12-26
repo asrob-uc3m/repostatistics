@@ -1,37 +1,157 @@
-import requests, json
-import operator
-from tqdm import tqdm
 import begin
 
+
+from advanced import extract_all_data
+
+def generate_webpage(organization):
+    webpage = ('<html>\n'
+         '    <body>\n'
+         '    <h1>Top Contributors</h1>\n'
+         '    <table style="width:100%">\n'
+         '        <tr>\n'
+         '            <th>Pos</th>\n'
+         '            <th></th>\n'
+         '            <th>Username</th>\n'
+         '            <th>Contribs</th>\n'
+         '        </tr>\n'
+         '        {top_contributors_rows}\n'
+         '    </table>\n'
+         '    <h1>Top Team Contributions</h1>\n'
+         '    <table style="width:100%">\n'
+         '        <tr>\n'
+         '            <th>Pos</th>\n'
+         '            <th>Team</th>\n'
+         '            <th>Contribs</th>\n'
+         '        </tr>\n'
+         '        {top_teams_rows}\n'
+         '    </table>\n'
+         '    <h1>Top Issues</h1>\n'
+         '    <table style="width:100%">\n'
+         '        <tr>\n'
+         '            <th>Pos</th>\n'
+         '            <th></th>\n'
+         '            <th>Username</th>\n'
+         '            <th>Opened Issues</th>\n'
+         '            <th>Currently Open</th>\n'
+         '            <th>Closed Issues</th>\n'
+         '            <th>Assigned and open</th>\n'
+         '            <th>Assigned and closed</th>\n'
+         '        </tr>\n'
+         '        {top_issues_rows}\n'
+         '    </table>\n'
+         '    <h1>Top Team Issues</h1>\n'
+         '    <table style="width:100%">\n'
+         '        <tr>\n'
+         '            <th>Pos</th>\n'
+         '            <th>Team</th>\n'
+         '            <th>Opened Issues</th>\n'
+         '            <th>Currently Open</th>\n'
+         '            <th>Closed Issues</th>\n'
+         '        </tr>\n'
+         '        {top_team_issues_rows}\n'
+         '    </table>\n'
+         '    </body>\n'
+         '</html>')
+
+    # Compute Top Contributors
+    top_contributors_rows = ''
+    sorted_contribs = sorted(organization['members'].items(), key=lambda x: x[1]['total_contributions'], reverse=True)
+    for i, (name, data) in enumerate(sorted_contribs):
+        top_contributors_rows += '<tr>\n<th>{}</th>\n<th><img src="{}" width="50px"></th>\n<th>{}</th>\n<th>{}</th>\n</tr>\n'.format(i+1,
+                                    data['avatar_url'], name, data['total_contributions'])
+
+    # Compute Top Team Contributions
+    top_teams_rows = ''
+    teams_contribs = {}
+    for team_name, team in organization['teams'].items():
+        teams_contribs[team_name] = 0
+        for repo in team['repos']:
+            try:
+                teams_contribs[team_name] += sum(organization['repos'][repo]['contributors'].values())
+            except KeyError:
+                pass
+    sorted_team_contribs = sorted(teams_contribs.items(), key=lambda x: x[1], reverse=True)
+    for i, (team, contribs) in enumerate(sorted_team_contribs):
+        top_teams_rows += '<tr>\n<th>{}</th>\n<th>{}</th>\n<th>{}</th>\n</tr>\n'.format(i+1, team, contribs)
+
+    # Compute Top Issues
+    top_issues_rows = ''
+    sorted_issues = sorted(organization['members'].items(), key=lambda x: len(x[1]['closed_issues']), reverse=True)
+    for i, (member, member_data) in enumerate(sorted_issues):
+        currently_open = 0
+        for repo, issue in member_data['opened_issues']:
+            if issue in organization['repos'][repo]['open_issues']:
+                currently_open += 1
+
+        assigned_and_open = 0
+        assigned_and_closed = 0
+        for repo, issue in member_data['assigned_issues']:
+            if issue in organization['repos'][repo]['open_issues']:
+                assigned_and_open += 1
+            else:
+                assigned_and_closed += 1
+
+        top_issues_rows += \
+        """<tr>
+           <th>{}</th>
+           <th><img src="{}" width="50px"></th>
+           <th>{}</th>
+           <th>{}</th>
+           <th>{}</th>
+           <th>{}</th>
+           <th>{}</th>
+           <th>{}</th>
+        </tr>
+        """.format(i+1, member_data['avatar_url'], member, len(member_data['opened_issues']), currently_open,
+                                len(member_data['closed_issues']), assigned_and_open, assigned_and_closed)
+
+        # Store info in organization dict
+        organization['members'][member]['open_issues'] = currently_open
+        organization['members'][member]['assigned_open_issues'] = assigned_and_open
+        organization['members'][member]['assigned_closed_issues'] = assigned_and_closed
+
+    # Compute Top Team Issues
+    top_team_issues_rows = ''
+    team_issues = {team: dict() for team in organization['teams']}
+    for team_name, team in organization['teams'].items():
+        try:
+            # Create team entry
+            team_issues[team_name]['opened_issues'] = 0
+            team_issues[team_name]['closed_issues'] = 0
+            team_issues[team_name]['open_issues'] = 0
+            team_issues[team_name]['assigned_open_issues'] = 0
+            team_issues[team_name]['assigned_closed_issues'] = 0
+
+            for repo in team['repos']:
+                repo_data = organization['repos'][repo]
+                team_issues[team_name]['opened_issues'] += len(repo_data['issues'])
+                team_issues[team_name]['open_issues'] += len(repo_data['open_issues'])
+
+            team_issues[team_name]['closed_issues'] = team_issues[team_name]['opened_issues'] - team_issues[team_name]['open_issues']
+        except KeyError:
+            pass
+
+    sorted_team_issues = sorted(team_issues.items(), key=lambda x: x[1]['closed_issues'], reverse=True)
+    for i, (team, team_issues_data) in enumerate(sorted_team_issues):
+        top_team_issues_rows += \
+        """<tr>
+           <th>{}</th>
+           <th>{}</th>
+           <th>{}</th>
+           <th>{}</th>
+           <th>{}</th>
+        </tr>
+        """.format(i+1, team, team_issues_data['opened_issues'], team_issues_data['closed_issues'],
+                   team_issues_data['open_issues'])
+
+    return webpage.format(top_contributors_rows=top_contributors_rows, top_teams_rows=top_teams_rows,
+                          top_issues_rows=top_issues_rows, top_team_issues_rows=top_team_issues_rows)
+
+
 @begin.start(auto_convert=True)
-def main(org: 'Github organization name' = 'asrob-uc3m', access_token: 'Access token' = '',
-         generate_html: 'Generate html page with ranking' = False):
-    """
-    This is the program description
-    """
-    url_repos = 'https://api.github.com/orgs/{}/repos'
-    url_repo_contributors = 'https://api.github.com/repos/{}/{}/contributors'
-    contributors = {}
+def main(org, access_token = None, output_file = 'index.html'):
+    organization = extract_all_data(org_name=org, access_token=access_token)
 
-    if access_token:
-        params = {'access_token':access_token}
-    else:
-        params = None
+    with open(output_file, 'w') as f:
+        f.write(generate_webpage(organization))
 
-    resp = requests.get(url=url_repos.format(org), params=params)
-    data = json.loads(resp.text)
-
-    for repo in tqdm(data):
-        #print(repo)
-        resp = requests.get(url_repo_contributors.format(org, repo['name']), params=params)
-        contrib_data = json.loads(resp.text)
-
-        for contributor in contrib_data:
-            total_contribs = contributors.get(contributor['login'], 0)
-            total_contribs += int(contributor['contributions'])
-            contributors[contributor['login']] = total_contribs
-
-    print("<html><body>")
-    for i, contributor in enumerate(reversed(sorted(contributors.items(), key=operator.itemgetter(1)))):
-        print("{:2.0f}. {} -> {}<br>".format(i+1, contributor[0], contributor[1]))
-    print("</body></html>")
