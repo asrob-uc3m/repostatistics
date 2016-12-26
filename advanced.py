@@ -30,7 +30,7 @@ def extract_all_data(org_name = '', access_token = ''):
 
     organization
      |- teams
-     |    |- members
+     |    |- members []
      |    |- repos []
      |- repos
      |    |- open_issues []

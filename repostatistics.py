@@ -39,6 +39,17 @@ def generate_webpage(organization):
          '        </tr>\n'
          '        {top_issues_rows}\n'
          '    </table>\n'
+         '    <h1>Top Team Issues</h1>\n'
+         '    <table style="width:100%">\n'
+         '        <tr>\n'
+         '            <th>Pos</th>\n'
+         '            <th>Team</th>\n'
+         '            <th>Opened Issues</th>\n'
+         '            <th>Currently Open</th>\n'
+         '            <th>Closed Issues</th>\n'
+         '        </tr>\n'
+         '        {top_team_issues_rows}\n'
+         '    </table>\n'
          '    </body>\n'
          '</html>')
 
@@ -94,8 +105,47 @@ def generate_webpage(organization):
         """.format(i+1, member_data['avatar_url'], member, len(member_data['opened_issues']), currently_open,
                                 len(member_data['closed_issues']), assigned_and_open, assigned_and_closed)
 
+        # Store info in organization dict
+        organization['members'][member]['open_issues'] = currently_open
+        organization['members'][member]['assigned_open_issues'] = assigned_and_open
+        organization['members'][member]['assigned_closed_issues'] = assigned_and_closed
+
+    # Compute Top Team Issues
+    top_team_issues_rows = ''
+    team_issues = {team: dict() for team in organization['teams']}
+    for team_name, team in organization['teams'].items():
+        try:
+            # Create team entry
+            team_issues[team_name]['opened_issues'] = 0
+            team_issues[team_name]['closed_issues'] = 0
+            team_issues[team_name]['open_issues'] = 0
+            team_issues[team_name]['assigned_open_issues'] = 0
+            team_issues[team_name]['assigned_closed_issues'] = 0
+
+            for repo in team['repos']:
+                repo_data = organization['repos'][repo]
+                team_issues[team_name]['opened_issues'] += len(repo_data['issues'])
+                team_issues[team_name]['open_issues'] += len(repo_data['open_issues'])
+
+            team_issues[team_name]['closed_issues'] = team_issues[team_name]['opened_issues'] - team_issues[team_name]['open_issues']
+        except KeyError:
+            pass
+
+    sorted_team_issues = sorted(team_issues.items(), key=lambda x: x[1]['closed_issues'], reverse=True)
+    for i, (team, team_issues_data) in enumerate(sorted_team_issues):
+        top_team_issues_rows += \
+        """<tr>
+           <th>{}</th>
+           <th>{}</th>
+           <th>{}</th>
+           <th>{}</th>
+           <th>{}</th>
+        </tr>
+        """.format(i+1, team, team_issues_data['opened_issues'], team_issues_data['closed_issues'],
+                   team_issues_data['open_issues'])
+
     return webpage.format(top_contributors_rows=top_contributors_rows, top_teams_rows=top_teams_rows,
-                          top_issues_rows=top_issues_rows)
+                          top_issues_rows=top_issues_rows, top_team_issues_rows=top_team_issues_rows)
 
 
 @begin.start(auto_convert=True)
