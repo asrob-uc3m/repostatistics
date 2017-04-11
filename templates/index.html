@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>ASROB - Top Contributors</title>
+    <title>{{org-name}} - Top Contributors</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -44,7 +44,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="http://asrob.uc3m.es">ASROB</a>
+                <a class="navbar-brand" href="{{org-url}}">{{org-name}}</a>
             </div>
         </div>
         <!-- /.container -->
@@ -80,186 +80,23 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                {% for contrib in contribs %}
+                                    {% if loop.index is 1 %}
                                     <tr class="warning">
-                                    <td>1</td>
-                                    <td><img src="https://avatars0.githubusercontent.com/u/1451819?v=3" width="50px"></td>
-                                    <td>David-Estevez</td>
-                                    <td>939</td>
-                                    </tr>
+                                    {% elif loop.index is 2 %}
                                     <tr class="info">
-                                    <td>2</td>
-                                    <td><img src="https://avatars0.githubusercontent.com/u/19774054?v=3" width="50px"></td>
-                                    <td>jgagom</td>
-                                    <td>918</td>
-                                    </tr>
+                                    {% elif loop.index is 3 %}
                                     <tr class="danger">
-                                    <td>3</td>
-                                    <td><img src="https://avatars2.githubusercontent.com/u/4448588?v=3" width="50px"></td>
-                                    <td>jgvictores</td>
-                                    <td>830</td>
-                                    </tr>
+                                    {% else %}
                                     <tr>
-                                    <td>4</td>
-                                    <td><img src="https://avatars2.githubusercontent.com/u/9977198?v=3" width="50px"></td>
-                                    <td>PeterBowman</td>
-                                    <td>125</td>
+                                    {% endif %}
+                                        <td>{{loop.index}}</td>
+                                        <td><img src="{{contrib.img_url}}" width="50px"></td>
+                                        <td>{{contrib.username}}</td>
+                                        <td>{{contrib.contribs}}</td>
                                     </tr>
-                                    <tr>
-                                    <td>5</td>
-                                    <td><img src="https://avatars3.githubusercontent.com/u/5154251?v=3" width="50px"></td>
-                                    <td>JavierIH</td>
-                                    <td>79</td>
-                                    </tr>
-                                    <tr>
-                                    <td>6</td>
-                                    <td><img src="https://avatars1.githubusercontent.com/u/6552927?v=3" width="50px"></td>
-                                    <td>RobertoHE</td>
-                                    <td>59</td>
-                                    </tr>
-                                    <tr>
-                                    <td>7</td>
-                                    <td><img src="https://avatars2.githubusercontent.com/u/11017088?v=3" width="50px"></td>
-                                    <td>JorFru</td>
-                                    <td>57</td>
-                                    </tr>
-                                    <tr>
-                                    <td>8</td>
-                                    <td><img src="https://avatars1.githubusercontent.com/u/5618792?v=3" width="50px"></td>
-                                    <td>kleiren</td>
-                                    <td>21</td>
-                                    </tr>
-                                    <tr>
-                                    <td>9</td>
-                                    <td><img src="https://avatars0.githubusercontent.com/u/17482647?v=3" width="50px"></td>
-                                    <td>andrespy</td>
-                                    <td>20</td>
-                                    </tr>
-                                    <tr>
-                                    <td>10</td>
-                                    <td><img src="https://avatars1.githubusercontent.com/u/19774706?v=3" width="50px"></td>
-                                    <td>asrobuc3m</td>
-                                    <td>18</td>
-                                    </tr>
-                                    <tr>
-                                    <td>11</td>
-                                    <td><img src="https://avatars3.githubusercontent.com/u/9463837?v=3" width="50px"></td>
-                                    <td>Rodriwp</td>
-                                    <td>11</td>
-                                    </tr>
-                                    <tr>
-                                    <td>12</td>
-                                    <td><img src="https://avatars0.githubusercontent.com/u/6809848?v=3" width="50px"></td>
-                                    <td>GuillemSebastianFletes</td>
-                                    <td>9</td>
-                                    </tr>
-                                    <tr>
-                                    <td>13</td>
-                                    <td><img src="https://avatars2.githubusercontent.com/u/6907809?v=3" width="50px"></td>
-                                    <td>raulperula</td>
-                                    <td>9</td>
-                                    </tr>
-                                    <tr>
-                                    <td>14</td>
-                                    <td><img src="https://avatars1.githubusercontent.com/u/9537923?v=3" width="50px"></td>
-                                    <td>jorgercobo</td>
-                                    <td>7</td>
-                                    </tr>
-                                    <tr>
-                                    <td>15</td>
-                                    <td><img src="https://avatars1.githubusercontent.com/u/6164172?v=3" width="50px"></td>
-                                    <td>KFRodicio</td>
-                                    <td>5</td>
-                                    </tr>
-                                    <tr>
-                                    <td>16</td>
-                                    <td><img src="https://avatars1.githubusercontent.com/u/1213317?v=3" width="50px"></td>
-                                    <td>ionelberdin</td>
-                                    <td>4</td>
-                                    </tr>
-                                    <tr>
-                                    <td>17</td>
-                                    <td><img src="https://avatars0.githubusercontent.com/u/9695183?v=3" width="50px"></td>
-                                    <td>pamarinp</td>
-                                    <td>2</td>
-                                    </tr>
-                                    <tr>
-                                    <td>18</td>
-                                    <td><img src="https://avatars3.githubusercontent.com/u/18406501?v=3" width="50px"></td>
-                                    <td>Morgloz</td>
-                                    <td>2</td>
-                                    </tr>
-                                    <tr>
-                                    <td>19</td>
-                                    <td><img src="https://avatars2.githubusercontent.com/u/9199376?v=3" width="50px"></td>
-                                    <td>avalbuena91</td>
-                                    <td>1</td>
-                                    </tr>
-                                    <tr>
-                                    <td>20</td>
-                                    <td><img src="https://avatars2.githubusercontent.com/u/24373181?v=3" width="50px"></td>
-                                    <td>Luciahonrubia</td>
-                                    <td>1</td>
-                                    </tr>
-                                    <tr>
-                                    <td>21</td>
-                                    <td><img src="https://avatars2.githubusercontent.com/u/14809127?v=3" width="50px"></td>
-                                    <td>Hiki5</td>
-                                    <td>0</td>
-                                    </tr>
-                                    <tr>
-                                    <td>22</td>
-                                    <td><img src="https://avatars3.githubusercontent.com/u/15308402?v=3" width="50px"></td>
-                                    <td>JavierGarciaO</td>
-                                    <td>0</td>
-                                    </tr>
-                                    <tr>
-                                    <td>23</td>
-                                    <td><img src="https://avatars2.githubusercontent.com/u/14809138?v=3" width="50px"></td>
-                                    <td>IvanMurciaEsteban</td>
-                                    <td>0</td>
-                                    </tr>
-                                    <tr>
-                                    <td>24</td>
-                                    <td><img src="https://avatars3.githubusercontent.com/u/17598605?v=3" width="50px"></td>
-                                    <td>JuanFdelArco</td>
-                                    <td>0</td>
-                                    </tr>
-                                    <tr>
-                                    <td>25</td>
-                                    <td><img src="https://avatars2.githubusercontent.com/u/9352980?v=3" width="50px"></td>
-                                    <td>patzb</td>
-                                    <td>0</td>
-                                    </tr>
-                                    <tr>
-                                    <td>26</td>
-                                    <td><img src="https://avatars1.githubusercontent.com/u/13722357?v=3" width="50px"></td>
-                                    <td>RzeroD</td>
-                                    <td>0</td>
-                                    </tr>
-                                    <tr>
-                                    <td>27</td>
-                                    <td><img src="https://avatars2.githubusercontent.com/u/10850655?v=3" width="50px"></td>
-                                    <td>EnriqueRMG</td>
-                                    <td>0</td>
-                                    </tr>
-                                    <tr>
-                                    <td>28</td>
-                                    <td><img src="https://avatars1.githubusercontent.com/u/15217421?v=3" width="50px"></td>
-                                    <td>raulgomezcalzada</td>
-                                    <td>0</td>
-                                    </tr>
-                                    <tr>
-                                    <td>29</td>
-                                    <td><img src="https://avatars0.githubusercontent.com/u/14809113?v=3" width="50px"></td>
-                                    <td>mikivw</td>
-                                    <td>0</td>
-                                    </tr>
-                                    <tr>
-                                    <td>30</td>
-                                    <td><img src="https://avatars1.githubusercontent.com/u/25606125?v=3" width="50px"></td>
-                                    <td>imontesino</td>
-                                    <td>0</td>
-                                    </tr>
+                                    
+                                 {% endfor %}
                                 </tbody>
                             </table>
                         </div>
@@ -281,306 +118,26 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="warning">
-                                       <td>1</td>
-                                       <td><img src="https://avatars0.githubusercontent.com/u/1451819?v=3" width="50px"></td>
-                                       <td>David-Estevez</td>
-                                       <td>73</td>
-                                       <td>22</td>
-                                       <td>58</td>
-                                       <td>5</td>
-                                       <td>30</td>
+                                {% for issue in issues %}
+                                        {% if loop.index is 1 %}
+                                        <tr class="warning">
+                                        {% elif loop.index is 2 %}
+                                        <tr class="info">
+                                        {% elif loop.index is 3 %}
+                                        <tr class="danger">
+                                        {% else %}
+                                        <tr>
+                                        {% endif %}
+                                            <td>{{loop.index}}</td>
+                                           <td><img src="{{issue.img_url}}" width="50px"></td>
+                                           <td>{{issue.username}}</td>
+                                           <td>{{issue.opened}}</td>
+                                           <td>{{issue.open}}</td>
+                                           <td>{{issue.closed}}</td>
+                                           <td>{{issue.assigned_open}}</td>
+                                           <td>{{issue.assigned_closed}}</td>
                                     </tr>
-                                    <tr class="info">
-                                       <td>2</td>
-                                       <td><img src="https://avatars2.githubusercontent.com/u/4448588?v=3" width="50px"></td>
-                                       <td>jgvictores</td>
-                                       <td>48</td>
-                                       <td>14</td>
-                                       <td>50</td>
-                                       <td>6</td>
-                                       <td>20</td>
-                                    </tr>
-                                    <tr class="danger">
-                                       <td>3</td>
-                                       <td><img src="https://avatars0.githubusercontent.com/u/17482647?v=3" width="50px"></td>
-                                       <td>andrespy</td>
-                                       <td>6</td>
-                                       <td>1</td>
-                                       <td>6</td>
-                                       <td>1</td>
-                                       <td>1</td>
-                                    </tr>
-                                    <tr>
-                                       <td>4</td>
-                                       <td><img src="https://avatars2.githubusercontent.com/u/9977198?v=3" width="50px"></td>
-                                       <td>PeterBowman</td>
-                                       <td>17</td>
-                                       <td>7</td>
-                                       <td>4</td>
-                                       <td>4</td>
-                                       <td>9</td>
-                                    </tr>
-                                    <tr>
-                                       <td>5</td>
-                                       <td><img src="https://avatars3.githubusercontent.com/u/9463837?v=3" width="50px"></td>
-                                       <td>Rodriwp</td>
-                                       <td>12</td>
-                                       <td>3</td>
-                                       <td>4</td>
-                                       <td>1</td>
-                                       <td>4</td>
-                                    </tr>
-                                    <tr>
-                                       <td>6</td>
-                                       <td><img src="https://avatars1.githubusercontent.com/u/9537923?v=3" width="50px"></td>
-                                       <td>jorgercobo</td>
-                                       <td>6</td>
-                                       <td>1</td>
-                                       <td>3</td>
-                                       <td>0</td>
-                                       <td>1</td>
-                                    </tr>
-                                    <tr>
-                                       <td>7</td>
-                                       <td><img src="https://avatars3.githubusercontent.com/u/17598605?v=3" width="50px"></td>
-                                       <td>JuanFdelArco</td>
-                                       <td>3</td>
-                                       <td>1</td>
-                                       <td>2</td>
-                                       <td>1</td>
-                                       <td>1</td>
-                                    </tr>
-                                    <tr>
-                                       <td>8</td>
-                                       <td><img src="https://avatars1.githubusercontent.com/u/19774706?v=3" width="50px"></td>
-                                       <td>asrobuc3m</td>
-                                       <td>1</td>
-                                       <td>0</td>
-                                       <td>1</td>
-                                       <td>0</td>
-                                       <td>1</td>
-                                    </tr>
-                                    <tr>
-                                       <td>9</td>
-                                       <td><img src="https://avatars3.githubusercontent.com/u/18406501?v=3" width="50px"></td>
-                                       <td>Morgloz</td>
-                                       <td>2</td>
-                                       <td>0</td>
-                                       <td>1</td>
-                                       <td>0</td>
-                                       <td>1</td>
-                                    </tr>
-                                    <tr>
-                                       <td>10</td>
-                                       <td><img src="https://avatars2.githubusercontent.com/u/24373181?v=3" width="50px"></td>
-                                       <td>Luciahonrubia</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>1</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                    </tr>
-                                    <tr>
-                                       <td>11</td>
-                                       <td><img src="https://avatars1.githubusercontent.com/u/6164172?v=3" width="50px"></td>
-                                       <td>KFRodicio</td>
-                                       <td>5</td>
-                                       <td>2</td>
-                                       <td>1</td>
-                                       <td>1</td>
-                                       <td>3</td>
-                                    </tr>
-                                    <tr>
-                                       <td>12</td>
-                                       <td><img src="https://avatars2.githubusercontent.com/u/14809127?v=3" width="50px"></td>
-                                       <td>Hiki5</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                    </tr>
-                                    <tr>
-                                       <td>13</td>
-                                       <td><img src="https://avatars3.githubusercontent.com/u/15308402?v=3" width="50px"></td>
-                                       <td>JavierGarciaO</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                    </tr>
-                                    <tr>
-                                       <td>14</td>
-                                       <td><img src="https://avatars0.githubusercontent.com/u/6809848?v=3" width="50px"></td>
-                                       <td>GuillemSebastianFletes</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                    </tr>
-                                    <tr>
-                                       <td>15</td>
-                                       <td><img src="https://avatars2.githubusercontent.com/u/14809138?v=3" width="50px"></td>
-                                       <td>IvanMurciaEsteban</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                    </tr>
-                                    <tr>
-                                       <td>16</td>
-                                       <td><img src="https://avatars2.githubusercontent.com/u/11017088?v=3" width="50px"></td>
-                                       <td>JorFru</td>
-                                       <td>9</td>
-                                       <td>1</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>2</td>
-                                    </tr>
-                                    <tr>
-                                       <td>17</td>
-                                       <td><img src="https://avatars2.githubusercontent.com/u/9199376?v=3" width="50px"></td>
-                                       <td>avalbuena91</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                    </tr>
-                                    <tr>
-                                       <td>18</td>
-                                       <td><img src="https://avatars0.githubusercontent.com/u/19774054?v=3" width="50px"></td>
-                                       <td>jgagom</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                    </tr>
-                                    <tr>
-                                       <td>19</td>
-                                       <td><img src="https://avatars2.githubusercontent.com/u/9352980?v=3" width="50px"></td>
-                                       <td>patzb</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                    </tr>
-                                    <tr>
-                                       <td>20</td>
-                                       <td><img src="https://avatars0.githubusercontent.com/u/9695183?v=3" width="50px"></td>
-                                       <td>pamarinp</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                    </tr>
-                                    <tr>
-                                       <td>21</td>
-                                       <td><img src="https://avatars1.githubusercontent.com/u/6552927?v=3" width="50px"></td>
-                                       <td>RobertoHE</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                    </tr>
-                                    <tr>
-                                       <td>22</td>
-                                       <td><img src="https://avatars1.githubusercontent.com/u/13722357?v=3" width="50px"></td>
-                                       <td>RzeroD</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                    </tr>
-                                    <tr>
-                                       <td>23</td>
-                                       <td><img src="https://avatars1.githubusercontent.com/u/5618792?v=3" width="50px"></td>
-                                       <td>kleiren</td>
-                                       <td>3</td>
-                                       <td>1</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                    </tr>
-                                    <tr>
-                                       <td>24</td>
-                                       <td><img src="https://avatars2.githubusercontent.com/u/10850655?v=3" width="50px"></td>
-                                       <td>EnriqueRMG</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                    </tr>
-                                    <tr>
-                                       <td>25</td>
-                                       <td><img src="https://avatars2.githubusercontent.com/u/6907809?v=3" width="50px"></td>
-                                       <td>raulperula</td>
-                                       <td>1</td>
-                                       <td>1</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                    </tr>
-                                    <tr>
-                                       <td>26</td>
-                                       <td><img src="https://avatars1.githubusercontent.com/u/1213317?v=3" width="50px"></td>
-                                       <td>ionelberdin</td>
-                                       <td>1</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                    </tr>
-                                    <tr>
-                                       <td>27</td>
-                                       <td><img src="https://avatars1.githubusercontent.com/u/15217421?v=3" width="50px"></td>
-                                       <td>raulgomezcalzada</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                    </tr>
-                                    <tr>
-                                       <td>28</td>
-                                       <td><img src="https://avatars0.githubusercontent.com/u/14809113?v=3" width="50px"></td>
-                                       <td>mikivw</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                    </tr>
-                                    <tr>
-                                       <td>29</td>
-                                       <td><img src="https://avatars3.githubusercontent.com/u/5154251?v=3" width="50px"></td>
-                                       <td>JavierIH</td>
-                                       <td>3</td>
-                                       <td>1</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>2</td>
-                                    </tr>
-                                    <tr>
-                                       <td>30</td>
-                                       <td><img src="https://avatars1.githubusercontent.com/u/25606125?v=3" width="50px"></td>
-                                       <td>imontesino</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                    </tr>
+                                {% endfor %}
                                 </tbody>
                             </table>                     
                         </div>
@@ -597,41 +154,23 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                {% for team_contrib in team_contribs %}
+                                    {% if loop.index is 1 %}
                                     <tr class="warning">
-                                        <td>1</td>
-                                        <td>RobotDevastation</td>
-                                        <td>1689</td>
-                                        </tr>
-                                   <tr class="info">
-                                        <td>2</td>
-                                        <td>Impresoras</td>
-                                        <td>936</td>
-                                        </tr>
-                                   <tr class="danger">
-                                        <td>3</td>
-                                        <td>ASROB</td>
-                                        <td>290</td>
-                                        </tr>
-                                        <tr>
-                                        <td>4</td>
-                                        <td>Robonova</td>
-                                        <td>271</td>
-                                        </tr>
-                                        <tr>
-                                        <td>5</td>
-                                        <td>RPC</td>
-                                        <td>20</td>
-                                        </tr>
-                                        <tr>
-                                        <td>6</td>
-                                        <td>G.A.M.E</td>
-                                        <td>17</td>
-                                        </tr>
-                                        <tr>
-                                        <td>7</td>
-                                        <td>UAVs</td>
-                                        <td>15</td>
+                                    {% elif loop.index is 2 %}
+                                    <tr class="info">
+                                    {% elif loop.index is 3 %}
+                                    <tr class="danger">
+                                    {% else %}
+                                    <tr>
+                                    {% endif %}
+                                        <td>{{loop.index}}</td>
+                                        <td>{{team_contrib.team}}</td>
+                                        <td>{{team_contrib.contribs}}</td>
                                     </tr>
+                                    
+                                 {% endfor %}
+                                    
                                 </tbody>
                             </table>
                         </div>
@@ -650,55 +189,23 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                {% for team_issue in team_issues %}
+                                    {% if loop.index is 1 %}
                                     <tr class="warning">
-                                       <td>1</td>
-                                       <td>ASROB</td>
-                                       <td>95</td>
-                                       <td>72</td>
-                                       <td>23</td>
-                                    </tr>
+                                    {% elif loop.index is 2 %}
                                     <tr class="info">
-                                       <td>2</td>
-                                       <td>RobotDevastation</td>
-                                       <td>67</td>
-                                       <td>45</td>
-                                       <td>22</td>
-                                    </tr>
+                                    {% elif loop.index is 3 %}
                                     <tr class="danger">
-                                       <td>3</td>
-                                       <td>Impresoras</td>
-                                       <td>23</td>
-                                       <td>14</td>
-                                       <td>9</td>
-                                    </tr>
+                                    {% else %}
                                     <tr>
-                                       <td>4</td>
-                                       <td>G.A.M.E</td>
-                                       <td>5</td>
-                                       <td>4</td>
-                                       <td>1</td>
+                                    {% endif %}
+                                        <td>{{loop.index}}</td>
+                                        <td>{{team_issue.team}}</td>
+                                        <td>{{issue.opened}}</td>
+                                        <td>{{issue.open}}</td>
+                                        <td>{{issue.closed}}</td>
                                     </tr>
-                                    <tr>
-                                       <td>5</td>
-                                       <td>UAVs</td>
-                                       <td>3</td>
-                                       <td>3</td>
-                                       <td>0</td>
-                                    </tr>
-                                    <tr>
-                                       <td>6</td>
-                                       <td>RPC</td>
-                                       <td>1</td>
-                                       <td>0</td>
-                                       <td>1</td>
-                                    </tr>
-                                    <tr>
-                                       <td>7</td>
-                                       <td>Robonova</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                       <td>0</td>
-                                    </tr>
+                                {% endfor %}
                                 </tbody>
                             </table>
                         </div>
