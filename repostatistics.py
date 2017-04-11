@@ -1,81 +1,37 @@
-import begin
+import os
 
+import begin
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from advanced import extract_all_data
 
-def generate_webpage(organization):
-    webpage = ('<html>\n'
-         '    <body>\n'
-         '    <h1>Top Contributors</h1>\n'
-         '    <table style="width:100%">\n'
-         '        <tr>\n'
-         '            <th>Pos</th>\n'
-         '            <th></th>\n'
-         '            <th>Username</th>\n'
-         '            <th>Contribs</th>\n'
-         '        </tr>\n'
-         '        {top_contributors_rows}\n'
-         '    </table>\n'
-         '    <h1>Top Team Contributions</h1>\n'
-         '    <table style="width:100%">\n'
-         '        <tr>\n'
-         '            <th>Pos</th>\n'
-         '            <th>Team</th>\n'
-         '            <th>Contribs</th>\n'
-         '        </tr>\n'
-         '        {top_teams_rows}\n'
-         '    </table>\n'
-         '    <h1>Top Issues</h1>\n'
-         '    <table style="width:100%">\n'
-         '        <tr>\n'
-         '            <th>Pos</th>\n'
-         '            <th></th>\n'
-         '            <th>Username</th>\n'
-         '            <th>Opened Issues</th>\n'
-         '            <th>Currently Open</th>\n'
-         '            <th>Closed Issues</th>\n'
-         '            <th>Assigned and open</th>\n'
-         '            <th>Assigned and closed</th>\n'
-         '        </tr>\n'
-         '        {top_issues_rows}\n'
-         '    </table>\n'
-         '    <h1>Top Team Issues</h1>\n'
-         '    <table style="width:100%">\n'
-         '        <tr>\n'
-         '            <th>Pos</th>\n'
-         '            <th>Team</th>\n'
-         '            <th>Opened Issues</th>\n'
-         '            <th>Currently Open</th>\n'
-         '            <th>Closed Issues</th>\n'
-         '        </tr>\n'
-         '        {top_team_issues_rows}\n'
-         '    </table>\n'
-         '    </body>\n'
-         '</html>')
+
+def generate_webpage(organization, name, website):
+    # Put the organization data in the required format
 
     # Compute Top Contributors
     top_contributors_rows = ''
     sorted_contribs = sorted(organization['members'].items(), key=lambda x: x[1]['total_contributions'], reverse=True)
-    for i, (name, data) in enumerate(sorted_contribs):
-        top_contributors_rows += '<tr>\n<th>{}</th>\n<th><img src="{}" width="50px"></th>\n<th>{}</th>\n<th>{}</th>\n</tr>\n'.format(i+1,
-                                    data['avatar_url'], name, data['total_contributions'])
+    contribs = [{'username':name,
+                 'img_url':data['avatar_url'],
+                 'contribs':data['total_contributions']} for name, data in sorted_contribs]
 
     # Compute Top Team Contributions
     top_teams_rows = ''
-    teams_contribs = {}
+    unsorted_team_contribs = {}
     for team_name, team in organization['teams'].items():
-        teams_contribs[team_name] = 0
+        unsorted_team_contribs[team_name] = 0
         for repo in team['repos']:
             try:
-                teams_contribs[team_name] += sum(organization['repos'][repo]['contributors'].values())
+                unsorted_team_contribs[team_name] += sum(organization['repos'][repo]['contributors'].values())
             except KeyError:
                 pass
-    sorted_team_contribs = sorted(teams_contribs.items(), key=lambda x: x[1], reverse=True)
-    for i, (team, contribs) in enumerate(sorted_team_contribs):
-        top_teams_rows += '<tr>\n<th>{}</th>\n<th>{}</th>\n<th>{}</th>\n</tr>\n'.format(i+1, team, contribs)
+    sorted_team_contribs = sorted(unsorted_team_contribs.items(), key=lambda x: x[1], reverse=True)
+    team_contribs = [{'team':team, 'contribs':contribs} for team, contribs in sorted_contribs]
+
 
     # Compute Top Issues
-    top_issues_rows = ''
+    issues = []
     sorted_issues = sorted(organization['members'].items(), key=lambda x: len(x[1]['closed_issues']), reverse=True)
     for i, (member, member_data) in enumerate(sorted_issues):
         currently_open = 0
@@ -91,19 +47,13 @@ def generate_webpage(organization):
             else:
                 assigned_and_closed += 1
 
-        top_issues_rows += \
-        """<tr>
-           <th>{}</th>
-           <th><img src="{}" width="50px"></th>
-           <th>{}</th>
-           <th>{}</th>
-           <th>{}</th>
-           <th>{}</th>
-           <th>{}</th>
-           <th>{}</th>
-        </tr>
-        """.format(i+1, member_data['avatar_url'], member, len(member_data['opened_issues']), currently_open,
-                                len(member_data['closed_issues']), assigned_and_open, assigned_and_closed)
+        issues.append({'img_url':member_data['avatar_url'],
+                       'username':member,
+                       'opened':len(member_data['opened_issues']),
+                       'open':currently_open,
+                       'closed':len(member_data['closed_issues']),
+                       'assigned_open':assigned_and_open,
+                       'assigned_closed':assigned_and_closed})
 
         # Store info in organization dict
         organization['members'][member]['open_issues'] = currently_open
@@ -112,46 +62,50 @@ def generate_webpage(organization):
 
     # Compute Top Team Issues
     top_team_issues_rows = ''
-    team_issues = {team: dict() for team in organization['teams']}
+    unsorted_team_issues = {team: dict() for team in organization['teams']}
     for team_name, team in organization['teams'].items():
         try:
             # Create team entry
-            team_issues[team_name]['opened_issues'] = 0
-            team_issues[team_name]['closed_issues'] = 0
-            team_issues[team_name]['open_issues'] = 0
-            team_issues[team_name]['assigned_open_issues'] = 0
-            team_issues[team_name]['assigned_closed_issues'] = 0
+            unsorted_team_issues[team_name]['opened_issues'] = 0
+            unsorted_team_issues[team_name]['closed_issues'] = 0
+            unsorted_team_issues[team_name]['open_issues'] = 0
+            unsorted_team_issues[team_name]['assigned_open_issues'] = 0
+            unsorted_team_issues[team_name]['assigned_closed_issues'] = 0
 
             for repo in team['repos']:
                 repo_data = organization['repos'][repo]
-                team_issues[team_name]['opened_issues'] += len(repo_data['issues'])
-                team_issues[team_name]['open_issues'] += len(repo_data['open_issues'])
+                unsorted_team_issues[team_name]['opened_issues'] += len(repo_data['issues'])
+                unsorted_team_issues[team_name]['open_issues'] += len(repo_data['open_issues'])
 
-            team_issues[team_name]['closed_issues'] = team_issues[team_name]['opened_issues'] - team_issues[team_name]['open_issues']
+            unsorted_team_issues[team_name]['closed_issues'] = unsorted_team_issues[team_name]['opened_issues'] - unsorted_team_issues[team_name]['open_issues']
         except KeyError:
             pass
 
-    sorted_team_issues = sorted(team_issues.items(), key=lambda x: x[1]['closed_issues'], reverse=True)
-    for i, (team, team_issues_data) in enumerate(sorted_team_issues):
-        top_team_issues_rows += \
-        """<tr>
-           <th>{}</th>
-           <th>{}</th>
-           <th>{}</th>
-           <th>{}</th>
-           <th>{}</th>
-        </tr>
-        """.format(i+1, team, team_issues_data['opened_issues'], team_issues_data['closed_issues'],
-                   team_issues_data['open_issues'])
+    sorted_team_issues = sorted(unsorted_team_issues.items(), key=lambda x: x[1]['closed_issues'], reverse=True)
+    team_issues =[{'team':team,
+                   'opened':team_issues_data['opened_issues'],
+                   'open':team_issues_data['open_issues'],
+                   'closed':team_issues_data['closed_issues'] } for team, team_issues_data in sorted_team_issues ]
 
-    return webpage.format(top_contributors_rows=top_contributors_rows, top_teams_rows=top_teams_rows,
-                          top_issues_rows=top_issues_rows, top_team_issues_rows=top_team_issues_rows)
+    # Generate the website using the template
+    env = Environment(loader=FileSystemLoader(os.path.join(os.path.split(__file__)[0],'templates')),
+                      autoescape=select_autoescape(['html', 'xml']))
+    template = env.get_template('index.html')
+    html = template.render(org_name=name,
+                           org_url=website,
+                           contribs=contribs,
+                           issues=issues,
+                           team_contribs=team_contribs,
+                           team_issues=team_issues)
+
+    return html
 
 
 @begin.start(auto_convert=True)
-def main(org, access_token = None, output_file = 'index.html'):
+def main(org, access_token=None, output_file=os.path.join(os.path.split(__file__)[0],'website', 'index.html'),
+         name='DUMMY', website='#'):
     organization = extract_all_data(org_name=org, access_token=access_token)
 
     with open(output_file, 'w') as f:
-        f.write(generate_webpage(organization))
+        f.write(generate_webpage(organization, name, website))
 
