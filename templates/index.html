@@ -7,9 +7,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="author" content="David-Estevez">
 
-    <title>{{org-name}} - Top Contributors</title>
+    <title>{{org_name}} - Top Contributors</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -44,7 +44,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="{{org-url}}">{{org-name}}</a>
+                <a class="navbar-brand" href="{{org_url}}">{{org_name}}</a>
             </div>
         </div>
         <!-- /.container -->
@@ -81,11 +81,11 @@
                                 </thead>
                                 <tbody>
                                 {% for contrib in contribs %}
-                                    {% if loop.index is 1 %}
+                                    {% if loop.index==1 %}
                                     <tr class="warning">
-                                    {% elif loop.index is 2 %}
+                                    {% elif loop.index==2 %}
                                     <tr class="info">
-                                    {% elif loop.index is 3 %}
+                                    {% elif loop.index==3 %}
                                     <tr class="danger">
                                     {% else %}
                                     <tr>
@@ -119,11 +119,11 @@
                                 </thead>
                                 <tbody>
                                 {% for issue in issues %}
-                                        {% if loop.index is 1 %}
+                                        {% if loop.index==1 %}
                                         <tr class="warning">
-                                        {% elif loop.index is 2 %}
+                                        {% elif loop.index==2 %}
                                         <tr class="info">
-                                        {% elif loop.index is 3 %}
+                                        {% elif loop.index==3 %}
                                         <tr class="danger">
                                         {% else %}
                                         <tr>
@@ -155,11 +155,11 @@
                                 </thead>
                                 <tbody>
                                 {% for team_contrib in team_contribs %}
-                                    {% if loop.index is 1 %}
+                                    {% if loop.index==1 %}
                                     <tr class="warning">
-                                    {% elif loop.index is 2 %}
+                                    {% elif loop.index==2 %}
                                     <tr class="info">
-                                    {% elif loop.index is 3 %}
+                                    {% elif loop.index==3 %}
                                     <tr class="danger">
                                     {% else %}
                                     <tr>
@@ -190,20 +190,20 @@
                                 </thead>
                                 <tbody>
                                 {% for team_issue in team_issues %}
-                                    {% if loop.index is 1 %}
+                                    {% if loop.index==1 %}
                                     <tr class="warning">
-                                    {% elif loop.index is 2 %}
+                                    {% elif loop.index==2 %}
                                     <tr class="info">
-                                    {% elif loop.index is 3 %}
+                                    {% elif loop.index==3 %}
                                     <tr class="danger">
                                     {% else %}
                                     <tr>
                                     {% endif %}
                                         <td>{{loop.index}}</td>
                                         <td>{{team_issue.team}}</td>
-                                        <td>{{issue.opened}}</td>
-                                        <td>{{issue.open}}</td>
-                                        <td>{{issue.closed}}</td>
+                                        <td>{{team_issue.opened}}</td>
+                                        <td>{{team_issue.open}}</td>
+                                        <td>{{team_issue.closed}}</td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>
