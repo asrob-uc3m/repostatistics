@@ -27,7 +27,7 @@ def generate_webpage(organization, name, website):
             except KeyError:
                 pass
     sorted_team_contribs = sorted(unsorted_team_contribs.items(), key=lambda x: x[1], reverse=True)
-    team_contribs = [{'team':team, 'contribs':contribs} for team, contribs in sorted_contribs]
+    team_contribs = [{'team':team, 'contribs':contribs} for team, contribs in sorted_team_contribs]
 
 
     # Compute Top Issues
