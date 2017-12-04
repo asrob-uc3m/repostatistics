@@ -18,7 +18,7 @@ class DataRetriever(object):
     def retrieve(self, url):
         if url not in self.cache:
             resp = requests.get(url=url, params=self.params)
-            data = json.loads(resp.text)
+            data = json.loads(resp.text or '[]')
             if 'next' in resp.links:
                 data.extend(self.retrieve(resp.links['next']['url']))
             self.cache[url] = data
