@@ -52,7 +52,6 @@
 
     <!-- Page Content -->
     <div class="container">
-
         <div class="row">
             <div class="col-lg-12 text-center">
 <div>
@@ -92,7 +91,7 @@
                                     {% endif %}
                                         <td>{{loop.index}}</td>
                                         <td><img src="{{contrib.img_url}}" width="50px"></td>
-                                        <td>{{contrib.username}}</td>
+                                        <td><a href="https://github.com/{{contrib.username}}">{{contrib.username}}</a></td>
                                         <td>{{contrib.contribs}}</td>
                                     </tr>
                                     
@@ -130,7 +129,7 @@
                                         {% endif %}
                                             <td>{{loop.index}}</td>
                                            <td><img src="{{issue.img_url}}" width="50px"></td>
-                                           <td>{{issue.username}}</td>
+                                           <td><a href="https://github.com/{{issue.username}}">{{issue.username}}</a></td>
                                            <td>{{issue.opened}}</td>
                                            <td>{{issue.open}}</td>
                                            <td>{{issue.closed}}</td>

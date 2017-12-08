@@ -18,10 +18,13 @@ class DataRetriever(object):
     def retrieve(self, url):
         if url not in self.cache:
             resp = requests.get(url=url, params=self.params)
-            data = json.loads(resp.text)
+            data = json.loads(resp.text or '[]')
+            if 'next' in resp.links:
+                data.extend(self.retrieve(resp.links['next']['url']))
             self.cache[url] = data
-
-        return self.cache[url]
+            return data
+        else:
+            return self.cache[url]
 
 def extract_all_data(org_name = '', access_token = ''):
     """
@@ -53,12 +56,12 @@ def extract_all_data(org_name = '', access_token = ''):
     :param access_token: Access token that grant access to the organization private data
     :return: a organization dict with the format described in this docstring
     """
-    url_org = 'https://api.github.com/orgs/{}'
+    url_org = 'https://api.github.com/orgs/{}/{}'
     dr = DataRetriever(access_token)
     organization = {}
 
     # Teams
-    url_teams = url_org.format(org_name)+'/teams'
+    url_teams = url_org.format(org_name, 'teams')
     teams_data = dr.retrieve(url_teams)
 
     organization['teams'] = dict()
@@ -73,7 +76,7 @@ def extract_all_data(org_name = '', access_token = ''):
         organization['teams'][team['name']] = work_group
 
     # Repos
-    url_repos = url_org.format(org_name)+'/repos'
+    url_repos = url_org.format(org_name, 'repos')
     repos_data = dr.retrieve(url_repos)
 
     organization['repos'] = dict()
@@ -107,7 +110,7 @@ def extract_all_data(org_name = '', access_token = ''):
 
     # Members
     organization['members'] = dict()
-    url_members = url_org.format(org_name)+'/members'
+    url_members = url_org.format(org_name, 'members')
     members_data = dr.retrieve(url_members)
 
     for user in members_data:
