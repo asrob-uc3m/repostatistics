@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 import begin
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -96,7 +97,8 @@ def generate_webpage(organization, name, website):
                            contribs=contribs,
                            issues=issues,
                            team_contribs=team_contribs,
-                           team_issues=team_issues)
+                           team_issues=team_issues,
+                           timestamp=datetime.now().strftime("%d/%m/%Y a las %H:%M"))
 
     return html
 
